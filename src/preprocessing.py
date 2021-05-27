@@ -59,13 +59,13 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
 
     books = []
     books_idx = []
-    print("--- Start locating files ---")
+    print("--- Start locating files ... ---")
     list_docs = os.listdir(books_folder)
     print("--- Locating files complete! ---")
 
     if lc_class == None:
         # import and clean books of required class
-        print("--- Start reading files ---")
+        print("--- Start reading files ... ---")
         iter = 0
         start = time.time()
         for doc in list_docs:
@@ -78,9 +78,9 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
                 with open(os.path.join(books_folder, doc), 'rb') as f:
                     books.append(f.read())
             iter += 1
-            if iter%100 == 0:
+            if iter%1000 == 0:
                 end = time.time()
-                print(iter, " - time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
+                print(iter, "- time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
         end = time.time()
         print("Total read time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
         print("--- Reading files complete! ---")
@@ -105,11 +105,10 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
                 except UnicodeDecodeError:
                     with open(os.path.join(books_folder, doc), 'rb') as f:
                         books.append(f.read())
-            if iter%100 == 0:
+            if iter%1000 == 0:
                 end = time.time()
-                print(iter, " - time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
+                print(iter, "- time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
             iter += 1
-
         end = time.time()
         print("Total read time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
         print("--- Reading files complete! ---")
@@ -119,13 +118,11 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
     print("--- Start slicing files ... ---")
     start = time.time()
     for i in range(len(books)):
-
         # set encoding
         if type(books[i]) == bytes:
             text = books[i].decode("latin-1")
         else:
             text = books[i]
-
         # begin slicing
         begin = text.find("Title:")
         ends = ["END OF THIS PROJECT GUTENBERG", "END OF THE PROJECT GUTENBERG",
@@ -140,11 +137,9 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
         if success == 0:
             print('Not sliced: ' + books_idx[i])
             books_sliced.append(text)
-
-        if i%100 == 0:
+        if i%1000 == 0:
             end = time.time()
-            print(i, " - time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
-
+            print(i, "- time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
     end = time.time()
     print("Total slice time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
     print("--- Slicing files complete! ---")
@@ -160,11 +155,10 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
         tokens = [w.lower() for w in tokens]
         #words = [w for w in tokens if not w in stop_words]
         books_clean.append(' '.join(tokens[:min(n_tokens,len(tokens))]))
-        if iter%100 == 0:
+        if iter%1000 == 0:
             end = time.time()
-            print(iter, " - time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
+            print(iter, "- time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
         iter += 1
-
     end = time.time()
     print("Total clean time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
     print("--- Cleaning files complete! ---")
