@@ -57,15 +57,17 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
     from nltk.tokenize import word_tokenize
     #from nltk.corpus import stopwords
 
+    books = []
+    books_idx = []
+    print("--- Start locating files ---")
+    list_docs = os.listdir(books_folder)
+    print("--- Locating files complete! ---")
+
     if lc_class == None:
         # import and clean books of required class
-        books = []
-        books_idx = []
-        print("--- Start locating files ---")
-        list_docs = os.listdir(books_folder)
-        print("--- Locating files complete! ---")
         print("--- Start reading files ---")
         iter = 0
+        start = time.time()
         for doc in list_docs:
             idx = doc.replace('-0', '').replace('-8', '')[:-4]
             books_idx.append(idx)
@@ -90,12 +92,6 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
         df = metadata[cls]
 
         # import and clean books of required class
-        books = []
-        books_idx = []
-        print("--- Start locating files ... ---")
-        list_docs = os.listdir(books_folder)
-        print("--- Locating files complete! ---")
-
         print("--- Start reading files ... ---")
         iter = 0
         start = time.time()
