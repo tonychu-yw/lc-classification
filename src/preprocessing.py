@@ -181,3 +181,26 @@ def clean_metadata(metadata_dir, books_folder, output_dir):
 
     # save cleaned metadata
     df_final.to_json(output_dir)
+
+#-----------------------------------------------------------------
+
+def remove_suffix(metadata_dir, output_dir):
+
+    metadata = pd.read_json(metadata_dir)
+
+    new_subjects = []
+    for row in metadata.subjects:
+        clean_subject = []
+        for subject in row:
+            suf = subject.find(" --")
+            if suf == -1:
+                sub = subject
+            else:
+                sub = subject[:suf]
+        if clean_subject == []:
+            clean_subject.append('')
+        new_subjects.append(clean_subject)
+
+    # save parsed subjects
+    metadata['subjects_new'] = new_subjects
+    metadata.to_json(output_dir)
