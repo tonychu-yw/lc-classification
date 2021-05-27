@@ -56,7 +56,7 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class="B"):
 
     # import metadata
     metadata = pd.read_json(metadata_dir)
-    cls = metadata.subjects.apply(lambda x: class in x)
+    cls = metadata.subjects.apply(lambda x: lc_class in x)
     df = metadata[cls]
 
     # import and clean books of required class
