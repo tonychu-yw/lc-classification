@@ -47,7 +47,7 @@ def unzip_books(source_folder, dest_folder):
 
 #-----------------------------------------------------------------
 
-def clean_books(books_folder, metadata_dir, output_dir, class="B"):
+def clean_books(books_folder, metadata_dir, output_dir, lc_class="B"):
 
     import nltk
     nltk.download('punkt')
