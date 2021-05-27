@@ -47,7 +47,7 @@ def unzip_books(source_folder, dest_folder):
 
 #-----------------------------------------------------------------
 
-def clean_books(books_folder, metadata_dir, output_dir, lc_class=None):
+def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=12000):
     """
     e.g., lc_class = "B" to choose the required class
     """
@@ -125,7 +125,7 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None):
         tokens = book.split()
         tokens = [w.lower() for w in tokens]
         #words = [w for w in tokens if not w in stop_words]
-        books_clean.append(' '.join(tokens[:12000]))
+        books_clean.append(' '.join(tokens[:min(n_tokens,len(tokens))]))
 
     # save cleaned books
     books_json = {int(k): v for k, v in zip(books_idx, books_clean)}
