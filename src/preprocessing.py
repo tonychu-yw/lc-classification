@@ -3,7 +3,7 @@ import shutil
 import zipfile
 import json
 import xml.etree.ElementTree as ET
-
+import time
 import numpy as np
 import pandas as pd
 
@@ -61,7 +61,11 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
         # import and clean books of required class
         books = []
         books_idx = []
+        print("--- Start locating files ---")
         list_docs = os.listdir(books_folder)
+        print("--- Locating files complete! ---")
+        print("--- Start reading files ---")
+        iter = 0
         for doc in list_docs:
             idx = doc.replace('-0', '').replace('-8', '')[:-4]
             books_idx.append(idx)
@@ -71,6 +75,13 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
             except UnicodeDecodeError:
                 with open(os.path.join(books_folder, doc), 'rb') as f:
                     books.append(f.read())
+            iter += 1
+            if iter%100 == 0:
+                end = time.time()
+                print(iter, " - time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
+        end = time.time()
+        print("Total read time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
+        print("--- Reading files complete! ---")
 
     else:
         # import metadata
@@ -81,7 +92,13 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
         # import and clean books of required class
         books = []
         books_idx = []
+        print("--- Start locating files ... ---")
         list_docs = os.listdir(books_folder)
+        print("--- Locating files complete! ---")
+
+        print("--- Start reading files ... ---")
+        iter = 0
+        start = time.time()
         for doc in list_docs:
             idx = doc.replace('-0', '').replace('-8', '')[:-4]
             if idx in [str(x) for x in df.document]:
@@ -92,9 +109,19 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
                 except UnicodeDecodeError:
                     with open(os.path.join(books_folder, doc), 'rb') as f:
                         books.append(f.read())
+            if iter%100 == 0:
+                end = time.time()
+                print(iter, " - time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
+            iter += 1
+
+        end = time.time()
+        print("Total read time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
+        print("--- Reading files complete! ---")
 
     # simple slicer to remove heads and tails of books
     books_sliced = []
+    print("--- Start slicing files ... ---")
+    start = time.time()
     for i in range(len(books)):
 
         # set encoding
@@ -118,17 +145,37 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
             print('Not sliced: ' + books_idx[i])
             books_sliced.append(text)
 
+        if i%100 == 0:
+            end = time.time()
+            print(i, " - time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
+
+    end = time.time()
+    print("Total slice time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
+    print("--- Slicing files complete! ---")
+
     # clean text
+    print("--- Start cleaning files ... ---")
     books_clean = []
     #stop_words = set(stopwords.words('english'))
+    iter = 0
+    start = time.time()
     for book in books_sliced:
         tokens = book.split()
         tokens = [w.lower() for w in tokens]
         #words = [w for w in tokens if not w in stop_words]
         books_clean.append(' '.join(tokens[:min(n_tokens,len(tokens))]))
+        if iter%100 == 0:
+            end = time.time()
+            print(iter, " - time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
+        iter += 1
+
+    end = time.time()
+    print("Total clean time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
+    print("--- Cleaning files complete! ---")
 
     # save cleaned books
     books_json = {int(k): v for k, v in zip(books_idx, books_clean)}
+    print("--- Saving files ... ---")
     with open(output_dir, "w") as f:
         json.dump(books_json, f)
 
