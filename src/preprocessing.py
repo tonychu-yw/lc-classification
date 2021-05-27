@@ -47,25 +47,23 @@ def unzip_books(source_folder, dest_folder):
 
 #-----------------------------------------------------------------
 
-def clean_books(books_folder, metadata_dir, output_dir, lc_class="B"):
+def clean_books(books_folder, metadata_dir, output_dir, lc_class=None):
+    """
+    e.g., lc_class = "B" to choose the required class
+    """
 
     import nltk
     nltk.download('punkt')
     from nltk.tokenize import word_tokenize
     #from nltk.corpus import stopwords
 
-    # import metadata
-    metadata = pd.read_json(metadata_dir)
-    cls = metadata.subjects.apply(lambda x: lc_class in x)
-    df = metadata[cls]
-
-    # import and clean books of required class
-    books = []
-    books_idx = []
-    list_docs = os.listdir(books_folder)
-    for doc in list_docs:
-        idx = doc.replace('-0', '').replace('-8', '')[:-4]
-        if idx in [str(x) for x in df.document]:
+    if lc_class == None:
+        # import and clean books of required class
+        books = []
+        books_idx = []
+        list_docs = os.listdir(books_folder)
+        for doc in list_docs:
+            idx = doc.replace('-0', '').replace('-8', '')[:-4]
             books_idx.append(idx)
             try:
                 with open(os.path.join(books_folder, doc), 'r') as f:
@@ -73,6 +71,27 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class="B"):
             except UnicodeDecodeError:
                 with open(os.path.join(books_folder, doc), 'rb') as f:
                     books.append(f.read())
+
+    else:
+        # import metadata
+        metadata = pd.read_json(metadata_dir)
+        cls = metadata.subjects.apply(lambda x: lc_class in x)
+        df = metadata[cls]
+
+        # import and clean books of required class
+        books = []
+        books_idx = []
+        list_docs = os.listdir(books_folder)
+        for doc in list_docs:
+            idx = doc.replace('-0', '').replace('-8', '')[:-4]
+            if idx in [str(x) for x in df.document]:
+                books_idx.append(idx)
+                try:
+                    with open(os.path.join(books_folder, doc), 'r') as f:
+                        books.append(f.read())
+                except UnicodeDecodeError:
+                    with open(os.path.join(books_folder, doc), 'rb') as f:
+                        books.append(f.read())
 
     # simple slicer to remove heads and tails of books
     books_sliced = []
@@ -106,7 +125,7 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class="B"):
         tokens = book.split()
         tokens = [w.lower() for w in tokens]
         #words = [w for w in tokens if not w in stop_words]
-        books_clean.append(' '.join(tokens))
+        books_clean.append(' '.join(tokens[:12000]))
 
     # save cleaned books
     books_json = {int(k): v for k, v in zip(books_idx, books_clean)}
