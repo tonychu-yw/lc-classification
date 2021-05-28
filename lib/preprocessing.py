@@ -52,19 +52,19 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
     e.g., lc_class = "B" to choose the required class
     """
 
-    import nltk
-    nltk.download('punkt')
-    from nltk.tokenize import word_tokenize
+    #import nltk
+    #nltk.download('punkt')
+    #from nltk.tokenize import word_tokenize
     #from nltk.corpus import stopwords
 
     books = []
     books_idx = []
-    print("--- Start locating files ... ---")
+    print("Locating files ...")
     list_docs = os.listdir(books_folder)
 
     if lc_class == None:
-        # import and clean books of required class
-        print("--- Start reading files ... ---")
+        # import and clean books of all classes
+        print("Reading files ...")
         iter = 0
         start = time.time()
         for doc in list_docs:
@@ -76,22 +76,17 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
             except UnicodeDecodeError:
                 with open(os.path.join(books_folder, doc), 'rb') as f:
                     books.append(f.read())
-            iter += 1
             #if iter%1000 == 0:
             #    end = time.time()
             #    print(iter, "- time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
-        end = time.time()
-        print("Total read time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
-        #print("--- Reading files complete! ---")
-
+            iter += 1
     else:
         # import metadata
         metadata = pd.read_json(metadata_dir)
         cls = metadata.subjects.apply(lambda x: lc_class in x)
         df = metadata[cls]
-
-        # import and clean books of required class
-        print("Start reading files ...")
+        # import and clean books of the required class
+        print("Reading files ...")
         iter = 0
         start = time.time()
         for doc in list_docs:
@@ -108,11 +103,10 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
             #    end = time.time()
             #    print(iter, "- time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
             iter += 1
-        end = time.time()
-        print("Total read time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
-        #print("--- Reading files complete! ---")
+    end = time.time()
+    print("Read time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
 
-    # slicing books - not using anymore to remain consistancy
+    # slicing books - not using anymore to remain book consistancy
     """
     # simple slicer to remove heads and tails of books
     books_sliced = []
@@ -146,15 +140,8 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
     #print("--- Slicing files complete! ---")
     """
 
-    for i in range(len(books)):
-        # set encoding
-        if type(books[i]) == bytes:
-            text = books[i].decode("latin-1")
-        else:
-            text = books[i]
-
     # clean text
-    print("Start cleaning files ...")
+    print("Cleaning files ...")
     books_clean = []
     #stop_words = set(stopwords.words('english'))
     iter = 0
@@ -163,7 +150,7 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
         if type(book) == bytes:
             text = book.decode("latin-1")
         else:
-            text = books
+            text = book
         tokens = text.split()
         tokens = [w.lower() for w in tokens]
         #words = [w for w in tokens if not w in stop_words]
@@ -173,7 +160,7 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
         #    print(iter, "- time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
         iter += 1
     end = time.time()
-    print("Total clean time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
+    print("Clean time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
     #print("--- Cleaning files complete! ---")
 
     # save cleaned books
