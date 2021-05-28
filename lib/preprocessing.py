@@ -62,9 +62,9 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
     print("Locating files ...")
     list_docs = os.listdir(books_folder)
 
+    print("Reading files ...")
     if lc_class == None:
         # import and clean books of all classes
-        print("Reading files ...")
         iter = 0
         start = time.time()
         for doc in list_docs:
@@ -86,7 +86,6 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
         cls = metadata.subjects.apply(lambda x: lc_class in x)
         df = metadata[cls]
         # import and clean books of the required class
-        print("Reading files ...")
         iter = 0
         start = time.time()
         for doc in list_docs:
@@ -106,11 +105,11 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
     end = time.time()
     print("Read time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
 
-    # slicing books - not using anymore to remain book consistancy
+    # slicing books - not using anymore to remain text consistancy
     """
     # simple slicer to remove heads and tails of books
     books_sliced = []
-    print("--- Start slicing files ... ---")
+    print("Start slicing files ...")
     start = time.time()
     for i in range(len(books)):
         # set encoding
@@ -136,8 +135,7 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
         #    end = time.time()
         #    print(i, "- time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
     end = time.time()
-    print("Total slice time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
-    #print("--- Slicing files complete! ---")
+    print("Slice time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
     """
 
     # clean text
@@ -165,7 +163,7 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
 
     # save cleaned books
     books_json = {int(k): v for k, v in zip(books_idx, books_clean)}
-    print("--- Saving files ... ---")
+    print("Saving files ...")
     with open(output_dir, "w") as f:
         json.dump(books_json, f)
 
