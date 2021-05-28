@@ -61,7 +61,6 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
     books_idx = []
     print("--- Start locating files ... ---")
     list_docs = os.listdir(books_folder)
-    print("--- Locating files complete! ---")
 
     if lc_class == None:
         # import and clean books of required class
@@ -78,12 +77,12 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
                 with open(os.path.join(books_folder, doc), 'rb') as f:
                     books.append(f.read())
             iter += 1
-            if iter%1000 == 0:
-                end = time.time()
-                print(iter, "- time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
+            #if iter%1000 == 0:
+            #    end = time.time()
+            #    print(iter, "- time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
         end = time.time()
         print("Total read time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
-        print("--- Reading files complete! ---")
+        #print("--- Reading files complete! ---")
 
     else:
         # import metadata
@@ -105,13 +104,13 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
                 except UnicodeDecodeError:
                     with open(os.path.join(books_folder, doc), 'rb') as f:
                         books.append(f.read())
-            if iter%1000 == 0:
-                end = time.time()
-                print(iter, "- time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
+            #if iter%1000 == 0:
+            #    end = time.time()
+            #    print(iter, "- time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
             iter += 1
         end = time.time()
         print("Total read time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
-        print("--- Reading files complete! ---")
+        #print("--- Reading files complete! ---")
 
     # simple slicer to remove heads and tails of books
     books_sliced = []
@@ -137,12 +136,12 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
         if success == 0:
             print('Not sliced: ' + books_idx[i])
             books_sliced.append(text)
-        if i%1000 == 0:
-            end = time.time()
-            print(i, "- time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
+        #if i%1000 == 0:
+        #    end = time.time()
+        #    print(i, "- time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
     end = time.time()
     print("Total slice time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
-    print("--- Slicing files complete! ---")
+    #print("--- Slicing files complete! ---")
 
     # clean text
     print("--- Start cleaning files ... ---")
@@ -155,13 +154,13 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
         tokens = [w.lower() for w in tokens]
         #words = [w for w in tokens if not w in stop_words]
         books_clean.append(' '.join(tokens[:min(n_tokens,len(tokens))]))
-        if iter%1000 == 0:
-            end = time.time()
-            print(iter, "- time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
+        #if iter%1000 == 0:
+        #    end = time.time()
+        #    print(iter, "- time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
         iter += 1
     end = time.time()
     print("Total clean time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
-    print("--- Cleaning files complete! ---")
+    #print("--- Cleaning files complete! ---")
 
     # save cleaned books
     books_json = {int(k): v for k, v in zip(books_idx, books_clean)}
@@ -253,6 +252,7 @@ def remove_suffix(metadata_dir, output_dir):
                 sub = subject
             else:
                 sub = subject[:suf]
+            clean_subject.append(sub)
         if clean_subject == []:
             clean_subject.append('')
         new_subjects.append(clean_subject)
