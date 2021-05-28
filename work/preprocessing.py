@@ -91,7 +91,7 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
         df = metadata[cls]
 
         # import and clean books of required class
-        print("--- Start reading files ... ---")
+        print("Start reading files ...")
         iter = 0
         start = time.time()
         for doc in list_docs:
@@ -112,6 +112,8 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
         print("Total read time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
         #print("--- Reading files complete! ---")
 
+    # slicing books - not using anymore to remain consistancy
+    """
     # simple slicer to remove heads and tails of books
     books_sliced = []
     print("--- Start slicing files ... ---")
@@ -142,15 +144,27 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
     end = time.time()
     print("Total slice time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
     #print("--- Slicing files complete! ---")
+    """
+
+    for i in range(len(books)):
+        # set encoding
+        if type(books[i]) == bytes:
+            text = books[i].decode("latin-1")
+        else:
+            text = books[i]
 
     # clean text
-    print("--- Start cleaning files ... ---")
+    print("Start cleaning files ...")
     books_clean = []
     #stop_words = set(stopwords.words('english'))
     iter = 0
     start = time.time()
-    for book in books_sliced:
-        tokens = book.split()
+    for book in books:
+        if type(book) == bytes:
+            text = book.decode("latin-1")
+        else:
+            text = books
+        tokens = text.split()
         tokens = [w.lower() for w in tokens]
         #words = [w for w in tokens if not w in stop_words]
         books_clean.append(' '.join(tokens[:min(n_tokens,len(tokens))]))
