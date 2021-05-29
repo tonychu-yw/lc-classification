@@ -68,7 +68,7 @@ class Book2Vec:
 #-----------------------------------------------------------------
 
     @classmethod
-    def save_embeddings(embeddings, filename):
+    def save_embeddings(cls, embeddings, filename):
         with open(filename, 'wb') as handle:
             pickle.dump(np.array(embeddings), handle)
 
