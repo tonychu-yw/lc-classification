@@ -1,8 +1,11 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# jupyter notebooks
 */.ipynb_checkpoints/*
 *.ipynb_checkpoints
-*/.txt/*
-*.txt
-*/.pkl/*
-*.pkl
-*/.json/*
-*.json
+
+# data
+data/

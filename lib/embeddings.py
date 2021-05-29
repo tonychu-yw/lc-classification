@@ -2,7 +2,13 @@ import numpy as np
 import time
 import pickle
 
-!pip install transformers
+import subprocess
+import sys
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+install('transformers')
 import torch
 from transformers import LongformerTokenizer, LongformerModel
 
@@ -47,12 +53,12 @@ class Book2Vec:
         start = time.time()
         iter = 0
         for book_i in book_list:
-            doc_embedding = embed(book_i)
+            doc_embedding = self._embed(book_i)
             doc_embeds.append(doc_embedding)
             iter += 1
-            if iter%100 == 0:
+            if iter%500 == 0:
                 end = time.time()
-                print(iter, " - time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
+                print(iter, "- time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
 
         end = time.time()
         print("Total runtime:", round((end-start)//60), "min",  round((end-start)%60), "sec")

@@ -15,7 +15,7 @@ def unzip_books(source_folder, dest_folder):
         source_folder:  folder path of downloaded gutenberg text files
         dest_folder:    folder path to store the selected books (do not set this same as source_folder)
     Return:
-        None (move files directly to the destination folder)
+        None            (move files directly to the destination folder)
     """
 
     os.chdir(source_folder)  # set directory
@@ -61,7 +61,7 @@ def clean_books(books_folder, output_dir, n_tokens=12000):
         output_dir:     file path/name to store the aggregated books (.json)
         n_tokens:       number of tokens to grab (first n tokens)
     Return:
-        None (save output file directly)
+        None            (save output file directly)
     """
 
     #import nltk
@@ -164,7 +164,7 @@ def get_metadata(source_folder, dest_dir):
         source_folder:  file path of the metadata files (.json)
         dest_dir:       file path/name to store the cleaned metadata (.json)
     Return:
-        None (save output file directly)
+        None            (save output file directly)
     """
 
     # get file
@@ -220,7 +220,7 @@ def clean_metadata(metadata_dir, books_folder, output_dir):
         books_folder:   folder path of the gutenberg books
         output_dir:     file path/name to store the cleaned metadata (.json)
     Return:
-        None (save output file directly)
+        None            (save output file directly)
     """
 
     # import data
