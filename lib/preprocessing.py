@@ -10,6 +10,13 @@ import pandas as pd
 #-----------------------------------------------------------------
 
 def unzip_books(source_folder, dest_folder):
+    """
+    Arguments:
+        source_folder:  folder path of downloaded gutenberg text files
+        dest_folder:    folder path to store the selected books (do not set this same as source_folder)
+    Return:
+        None (move files directly to the destination folder)
+    """
 
     os.chdir(source_folder)  # set directory
     onlyfiles = [f for f in os.listdir(source_folder) if os.path.isfile(os.path.join(source_folder, f))]  # read file names
@@ -47,9 +54,14 @@ def unzip_books(source_folder, dest_folder):
 
 #-----------------------------------------------------------------
 
-def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=12000):
+def clean_books(books_folder, output_dir, n_tokens=12000):
     """
-    e.g., lc_class = "B" to choose the required class
+    Arguments:
+        books_folder:   folder of gutenberg text files
+        output_dir:     file path/name to store the aggregated books (.json)
+        n_tokens:       number of tokens to grab (first n tokens)
+    Return:
+        None (save output file directly)
     """
 
     #import nltk
@@ -63,45 +75,22 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
     list_docs = os.listdir(books_folder)
 
     print("Reading files ...")
-    if lc_class == None:
-        # import and clean books of all classes
-        iter = 0
-        start = time.time()
-        for doc in list_docs:
-            idx = doc.replace('-0', '').replace('-8', '')[:-4]
-            books_idx.append(idx)
-            try:
-                with open(os.path.join(books_folder, doc), 'r') as f:
-                    books.append(f.read())
-            except UnicodeDecodeError:
-                with open(os.path.join(books_folder, doc), 'rb') as f:
-                    books.append(f.read())
-            #if iter%1000 == 0:
-            #    end = time.time()
-            #    print(iter, "- time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
-            iter += 1
-    else:
-        # import metadata
-        metadata = pd.read_json(metadata_dir)
-        cls = metadata.subjects.apply(lambda x: lc_class in x)
-        df = metadata[cls]
-        # import and clean books of the required class
-        iter = 0
-        start = time.time()
-        for doc in list_docs:
-            idx = doc.replace('-0', '').replace('-8', '')[:-4]
-            if idx in [str(x) for x in df.document]:
-                books_idx.append(idx)
-                try:
-                    with open(os.path.join(books_folder, doc), 'r') as f:
-                        books.append(f.read())
-                except UnicodeDecodeError:
-                    with open(os.path.join(books_folder, doc), 'rb') as f:
-                        books.append(f.read())
-            #if iter%1000 == 0:
-            #    end = time.time()
-            #    print(iter, "- time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
-            iter += 1
+    # import and clean books of all classes
+    iter = 0
+    start = time.time()
+    for doc in list_docs:
+        idx = doc.replace('-0', '').replace('-8', '')[:-4]
+        books_idx.append(idx)
+        try:
+            with open(os.path.join(books_folder, doc), 'r') as f:
+                books.append(f.read())
+        except UnicodeDecodeError:
+            with open(os.path.join(books_folder, doc), 'rb') as f:
+                books.append(f.read())
+        #if iter%1000 == 0:
+        #    end = time.time()
+        #    print(iter, "- time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
+        iter += 1
     end = time.time()
     print("Read time:", round((end-start)//60), "min",  round((end-start)%60), "sec")
 
@@ -170,6 +159,13 @@ def clean_books(books_folder, metadata_dir, output_dir, lc_class=None, n_tokens=
 #-----------------------------------------------------------------
 
 def get_metadata(source_folder, dest_dir):
+    """
+    Arguments:
+        source_folder:  file path of the metadata files (.json)
+        dest_dir:       file path/name to store the cleaned metadata (.json)
+    Return:
+        None (save output file directly)
+    """
 
     # get file
     books = {}
@@ -218,6 +214,14 @@ def get_metadata(source_folder, dest_dir):
 #-----------------------------------------------------------------
 
 def clean_metadata(metadata_dir, books_folder, output_dir):
+    """
+    Arguments:
+        metadata_dir:   file path of the metadata file (.json)
+        books_folder:   folder path of the gutenberg books
+        output_dir:     file path/name to store the cleaned metadata (.json)
+    Return:
+        None (save output file directly)
+    """
 
     # import data
     df = pd.read_json(metadata_dir)  # import data
@@ -233,14 +237,23 @@ def clean_metadata(metadata_dir, books_folder, output_dir):
     docs_no = [x.replace('-0', '').replace('-8', '')[:-4] for x in list_docs]
     df_final = df[df.document.isin(docs_no)]
 
+    # further adjust order and column name for consistancy
+    df_final['document'] = [int(x) for x in df_final['document']]
+    df_final = df_final.sort_values(by=['document']).reset_index(drop=True)  # sort metadata
+    df_final.columns = ['index', 'title', 'creator', 'subjects']
+
     # save cleaned metadata
     df_final.to_json(output_dir)
 
 #-----------------------------------------------------------------
 
-def remove_suffix(metadata_dir, output_dir):
-
-    metadata = pd.read_json(metadata_dir)
+def remove_suffix(metadata):
+    """
+    Arguments:
+        metadata:   pandas dataframe
+    Return:
+        metadata:   cleaned pandas dataframe
+    """
 
     new_subjects = []
     for row in metadata.subjects:
@@ -258,4 +271,5 @@ def remove_suffix(metadata_dir, output_dir):
 
     # save parsed subjects
     metadata['subjects_new'] = new_subjects
-    metadata.to_json(output_dir)
+
+    return metadata
