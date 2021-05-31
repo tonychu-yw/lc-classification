@@ -11,4 +11,4 @@ __pycache__/
 
 # data
 data/
-model/
+models/
