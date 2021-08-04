@@ -240,7 +240,7 @@ def clean_metadata(metadata_dir, books_folder, output_dir):
     # further adjust order and column name for consistancy
     df_final['document'] = [int(x) for x in df_final['document']]
     df_final = df_final.sort_values(by=['document']).reset_index(drop=True)  # sort metadata
-    df_final.columns = ['index', 'title', 'creator', 'subjects']
+    df_final.columns = ['id', 'title', 'creator', 'subjects']
 
     # save cleaned metadata
     df_final.to_json(output_dir)
