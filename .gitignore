@@ -6,6 +6,8 @@ __pycache__/
 # jupyter notebooks
 */.ipynb_checkpoints/*
 *.ipynb_checkpoints
+*/.ipynb/*
+*.ipynb
 
 # data
 data/
