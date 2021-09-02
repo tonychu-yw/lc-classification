@@ -205,7 +205,7 @@ if __name__ == "__main__":
     test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
     # execute main
-    clf = LongformerClassification(tokenizer='allenai/longformer-base-4096', model=args.model, num_labels=19)
+    clf = LongformerClassification(tokenizer='allenai/longformer-base-4096', model=args.checkpoint, num_labels=19)
     if args.mode == "train":
         clf.train(train_loader, val_loader, save_model_name="longformer-class-2048", max_epoch=3)
     elif args.mode == "test":
