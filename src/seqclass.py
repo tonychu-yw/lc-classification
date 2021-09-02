@@ -95,8 +95,8 @@ class LongformerClassification:
                 train_acc += accuracy_score(true, pred, normalize=False)
 
             print(
-                "Train loss:", round(train_loss/len(train_loader), 4), "\t", 
-                "Train acc:", round(train_acc/len(train_loader), 4)
+                "Train loss:", round(train_loss/(len(train_loader)*train_loader.batch_size), 4), "\t", 
+                "Train acc:", round(train_acc/(len(train_loader)*train_loader.batch_size), 4)
             )
 
             # save model
@@ -123,8 +123,8 @@ class LongformerClassification:
             # record epoch runtime 
             mid_curr = time.time()
             print(
-                "Val loss:", round(val_loss/len(val_loader), 4), "\t",
-                "Val acc:", round(val_acc/len(val_loader), 4)
+                "Val loss:", round(val_loss/(len(val_loader)*val_loader.batch_size), 4), "\t",
+                "Val acc:", round(val_acc/(len(val_loader)*val_loader.batch_size), 4)
             )
             self._print_time("Runtime:", mid_prev, mid_curr)
             mid_prev = mid_curr
@@ -156,8 +156,8 @@ class LongformerClassification:
                 test_acc += accuracy_score(true, pred, normalize=False)
 
         print(
-            "Test loss:", round(test_loss/len(test_loader), 4), "\t", 
-            "Test acc:", round(test_acc/len(test_loader), 4), 
+            "Test loss:", round(test_loss/(len(test_loader)*test_loader.batch_size), 4), "\t", 
+            "Test acc:", round(test_acc/(len(test_loader)*test_loader.batch_size), 4), 
         )
 
 #-----------------------------------------------------------------
@@ -170,7 +170,6 @@ class LongformerClassification:
 #-----------------------------------------------------------------
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument('--mode', required=True, help="train or test model", default='train')
     parser.add_argument('--checkpoint', required=True, help="model using", default="allenai/longformer-base-4096")
