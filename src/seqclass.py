@@ -132,7 +132,6 @@ class LongformerClassification:
         print("--------------------")
         end = time.time()
         self._print_time("Total Runtime", start, end)
-        print("--------------------")
 
 #-----------------------------------------------------------------
 
