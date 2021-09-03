@@ -17,7 +17,7 @@ from transformers import LongformerTokenizer, LongformerModel
 #-----------------------------------------------------------------
 
 class Book2Vec:
-
+  
     def __init__(self, tokenizer='allenai/longformer-base-4096', model='allenai/longformer-base-4096'):
 
         self.device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
@@ -67,6 +67,7 @@ class Book2Vec:
     def save_embeddings(cls, embeddings, filename):
         with open(filename, 'wb') as handle:
             pickle.dump(np.array(embeddings), handle)
+            
 #-----------------------------------------------------------------
 
     @classmethod

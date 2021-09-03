@@ -69,7 +69,6 @@ class LongformerClassification:
         mid_prev = start
         for epoch in range(max_epoch):
             
-            print("--------------------")
             print("epoch " + str(epoch))
             train_loss = 0
             val_loss = 0
@@ -128,8 +127,8 @@ class LongformerClassification:
             )
             self._print_time("Runtime:", mid_prev, mid_curr)
             mid_prev = mid_curr
+            print("--------------------")
 
-        print("--------------------")
         end = time.time()
         self._print_time("Total Runtime", start, end)
 
@@ -205,9 +204,13 @@ if __name__ == "__main__":
     # execute main
     clf = LongformerClassification(tokenizer='allenai/longformer-base-4096', model=args.checkpoint, num_labels=19)
     if args.mode == "train":
+        print("========== Start Training ==========")
         clf.train(train_loader, val_loader, save_model_name="longformer-class-2048", max_epoch=3)
+        print("====================================")
     elif args.mode == "test":
+        print("========== Start Testing ==========")
         clf.predict(test_loader)
+        print("===================================")
     else:
         print('Error: Please input "train" or "test".')
 

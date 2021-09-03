@@ -1,4 +1,5 @@
 # Byte-compiled / optimized / DLL files
+.vscode/
 __pycache__/
 *.py[cod]
 *$py.class
@@ -6,12 +7,11 @@ __pycache__/
 # jupyter notebooks
 */.ipynb_checkpoints/*
 *.ipynb_checkpoints
-*/.ipynb/*
-*.ipynb
 
 # data
 data/
 work/
+models/
 */.csv/*
 *.csv
 */.gsheet/*
