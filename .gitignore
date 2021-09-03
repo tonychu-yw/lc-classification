@@ -12,7 +12,5 @@ __pycache__/
 data/
 work/
 models/
-*/.csv/*
-*.csv
 */.gsheet/*
 *.gsheet
