@@ -11,9 +11,9 @@ import pandas as pd
 
 def unzip_books(source_folder, dest_folder):
     """
-    Arguments:
-        source_folder:  folder path of downloaded gutenberg text files
-        dest_folder:    folder path to store the selected books (do not set this same as source_folder)
+    Args:
+        source_folder:  folder directory of downloaded gutenberg zip files
+        dest_folder:    folder directory to store the selected books (do not set this same as source_folder)
     Return:
         None            (move files directly to the destination folder)
     """
@@ -56,7 +56,7 @@ def unzip_books(source_folder, dest_folder):
 
 def clean_books(books_folder, output_dir, n_tokens=12000):
     """
-    Arguments:
+    Args:
         books_folder:   folder of gutenberg text files
         output_dir:     file path/name to store the aggregated books (.json)
         n_tokens:       number of tokens to grab (first n tokens)
@@ -160,7 +160,7 @@ def clean_books(books_folder, output_dir, n_tokens=12000):
 
 def get_metadata(source_folder, dest_dir):
     """
-    Arguments:
+    Args:
         source_folder:  file path of the metadata files (.json)
         dest_dir:       file path/name to store the cleaned metadata (.json)
     Return:
@@ -215,7 +215,7 @@ def get_metadata(source_folder, dest_dir):
 
 def clean_metadata(metadata_dir, books_folder, output_dir):
     """
-    Arguments:
+    Args:
         metadata_dir:   file path of the metadata file (.json)
         books_folder:   folder path of the gutenberg books
         output_dir:     file path/name to store the cleaned metadata (.json)
@@ -249,7 +249,7 @@ def clean_metadata(metadata_dir, books_folder, output_dir):
 
 def remove_suffix(metadata):
     """
-    Arguments:
+    Args:
         metadata:   pandas dataframe
     Return:
         metadata:   cleaned pandas dataframe
@@ -273,3 +273,19 @@ def remove_suffix(metadata):
     metadata['subjects_new'] = new_subjects
 
     return metadata
+
+#-----------------------------------------------------------------
+
+# save pickle files
+def save_pickle(stuff, fileName):
+    with open(fileName, 'wb') as f:
+        pickle.dump(stuff, f, pickle.HIGHEST_PROTOCOL)
+
+#-----------------------------------------------------------------
+
+# load pickle files
+def load_pickle(fileName):
+    with open(fileName, 'rb') as f:
+        return pickle.load(f)
+
+#-----------------------------------------------------------------
