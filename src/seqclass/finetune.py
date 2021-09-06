@@ -165,7 +165,7 @@ class LongformerClassifier:
 
 #-----------------------------------------------------------------
 
-    def _print_results(type, loss, acc, data_loader):
+    def _print_results(self, type, loss, acc, data_loader):
         print(
             type + " loss:", round(loss/(len(data_loader)*data_loader.batch_size), 4), "\t", 
             type + " acc:", round(acc/(len(data_loader)*data_loader.batch_size), 4), 
