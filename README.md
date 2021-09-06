@@ -6,10 +6,6 @@ This project proposes a transformer-based system that suggests Library of Congre
 
 I collected 50,000+ English eBooks from [Project Gutenberg](https://www.gutenberg.org/) for training and testing. 
 
-## Metadata Structure
-
-tbd
-
-## System Structure
+## Model Structure
 
 tbd
