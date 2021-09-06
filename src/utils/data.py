@@ -1,9 +1,9 @@
+import time
 import os
 import shutil
 import zipfile
 import json
 import xml.etree.ElementTree as ET
-import time
 import numpy as np
 import pandas as pd
 
@@ -54,7 +54,7 @@ def unzip_books(source_folder, dest_folder):
 
 #-----------------------------------------------------------------
 
-def clean_books(books_folder, output_dir, n_tokens=12000):
+def clean_books(books_folder, output_dir, n_tokens=8000):
     """
     Args:
         books_folder:   folder of gutenberg text files
@@ -158,10 +158,10 @@ def clean_books(books_folder, output_dir, n_tokens=12000):
 
 #-----------------------------------------------------------------
 
-def get_metadata(source_folder, dest_dir):
+def extract_metadata(source_folder, dest_dir):
     """
     Args:
-        source_folder:  file path of the metadata files (.json)
+        source_folder:  folder path of the metadata files
         dest_dir:       file path/name to store the cleaned metadata (.json)
     Return:
         None            (save output file directly)
@@ -213,40 +213,6 @@ def get_metadata(source_folder, dest_dir):
 
 #-----------------------------------------------------------------
 
-def clean_metadata(metadata_dir, books_folder, output_dir):
-    """
-    Args:
-        metadata_dir:   file path of the metadata file (.json)
-        books_folder:   folder path of the gutenberg books
-        output_dir:     file path/name to store the cleaned metadata (.json)
-    Return:
-        None            (save output file directly)
-    """
-
-    # import data
-    df = pd.read_json(metadata_dir)  # import data
-    df = df.T
-
-    # clean index and document names
-    df.reset_index(level=0, inplace=True)
-    df.rename(columns={'index':'document'}, inplace=True)
-    df.document = df.document.apply(lambda x: x[2:-4])
-
-    # remove metadata not in the downloaded books
-    list_docs = os.listdir(books_folder)
-    docs_no = [x.replace('-0', '').replace('-8', '')[:-4] for x in list_docs]
-    df_final = df[df.document.isin(docs_no)]
-
-    # further adjust order and column name for consistancy
-    df_final['document'] = [int(x) for x in df_final['document']]
-    df_final = df_final.sort_values(by=['document']).reset_index(drop=True)  # sort metadata
-    df_final.columns = ['id', 'title', 'creator', 'subjects']
-
-    # save cleaned metadata
-    df_final.to_json(output_dir)
-
-#-----------------------------------------------------------------
-
 def remove_suffix(metadata):
     """
     Args:
@@ -276,16 +242,39 @@ def remove_suffix(metadata):
 
 #-----------------------------------------------------------------
 
-# save pickle files
-def save_pickle(stuff, fileName):
-    with open(fileName, 'wb') as f:
-        pickle.dump(stuff, f, pickle.HIGHEST_PROTOCOL)
+def clean_metadata(metadata_dir, books_folder, output_dir):
+    """
+    Args:
+        metadata_dir:   file path of the metadata file (.json)
+        books_folder:   folder path of the gutenberg books
+        output_dir:     file path/name to store the cleaned metadata (.json)
+    Return:
+        None            (save output file directly)
+    """
 
-#-----------------------------------------------------------------
+    # import data
+    df = pd.read_json(metadata_dir)  # import data
+    df = df.T
 
-# load pickle files
-def load_pickle(fileName):
-    with open(fileName, 'rb') as f:
-        return pickle.load(f)
+    # clean index and document names
+    df.reset_index(level=0, inplace=True)
+    df.rename(columns={'index':'document'}, inplace=True)
+    df.document = df.document.apply(lambda x: x[2:-4])
+
+    # remove metadata not in the downloaded books
+    list_docs = os.listdir(books_folder)
+    docs_no = [x.replace('-0', '').replace('-8', '')[:-4] for x in list_docs]
+    df_final = df[df.document.isin(docs_no)]
+
+    # further adjust order and column name for consistancy
+    df_final['document'] = df_final['document'].apply(lambda x: int(x))
+    df_final = df_final.sort_values(by=['document']).reset_index(drop=True)  # sort metadata
+    df_final.columns = ['id', 'title', 'creator', 'subjects']
+    
+    # remove suffix in subjects
+    df_final = remove_suffix(df_final)
+
+    # save cleaned metadata
+    df_final.to_json(output_dir)
 
 #-----------------------------------------------------------------

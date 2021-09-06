@@ -1,36 +1,30 @@
 # import libraries
+import pip
 import time
-import pickle
-import numpy as np
-import pandas as pd
-from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
-import subprocess
-import sys
-def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+# import packages if not exist
+def import_or_install(package):
+    try:
+        __import__(package)
+    except ImportError:
+        pip.main(['install', package])  
 
-install('transformers')
+import_or_install('transformers')
 import torch
-from torch.utils.data import DataLoader
 from sklearn.metrics import accuracy_score
 from transformers import LongformerTokenizerFast, LongformerForSequenceClassification, AdamW 
 
-#-----------------------------------------------------------------
+# import pickle
 
 # save pickle files
-def save_pickle(stuff, fileName):
-    with open(fileName, 'wb') as f:
-        pickle.dump(stuff, f, pickle.HIGHEST_PROTOCOL)
-
-#-----------------------------------------------------------------
+#def save_pickle(stuff, fileName):
+#    with open(fileName, 'wb') as f:
+#        pickle.dump(stuff, f, pickle.HIGHEST_PROTOCOL)
 
 # load pickle files
-def load_pickle(fileName):
-    with open(fileName, 'rb') as f:
-        return pickle.load(f)
-
-#-----------------------------------------------------------------
+#def load_pickle(fileName):
+#    with open(fileName, 'rb') as f:
+#        return pickle.load(f)
 
 #-----------------------------------------------------------------
 #  Class GutenbergDataset
@@ -60,7 +54,7 @@ class GutenbergDataset(torch.utils.data.Dataset):
 
 class LongformerClassifier:
 
-    def __init__(self, tokenizer='allenai/longformer-base-4096', model='allenai/longformer-base-4096', num_labels=19):
+    def __init__(self, num_labels, tokenizer='allenai/longformer-base-4096', model='allenai/longformer-base-4096'):
         
         self.device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
         self.tokenizer = LongformerTokenizerFast.from_pretrained(tokenizer)
@@ -70,9 +64,9 @@ class LongformerClassifier:
 
 #-----------------------------------------------------------------
 
-    def train(self, train_loader, val_loader, save_model_name, max_epoch=3):
+    def train(self, train_loader, val_loader, save_name, learning_rate=5e-5, max_epoch=3):
 
-        optim = AdamW(self.model.parameters(), lr=5e-5)
+        optim = AdamW(self.model.parameters(), lr=learning_rate)
         start = time.time()
         mid_prev = start
         
@@ -103,14 +97,10 @@ class LongformerClassifier:
                 train_acc += accuracy_score(true, pred, normalize=False)
 
             # save model
-            modelName = "./models/" + save_model_name + "-" + str(round(time.time()))
+            modelName = "./models/" + save_name + "-" + str(round(time.time()))
             self.model.save_pretrained(modelName)
             #print("Model " + str(round(time.time())) + " saved!")
-            
-            print(
-                "Train loss:", round(train_loss/(len(train_loader)*train_loader.batch_size), 4), "\t", 
-                "Train acc:", round(train_acc/(len(train_loader)*train_loader.batch_size), 4)
-            )
+            self._print_results("Train", train_loss, train_acc, train_loader)
 
             # validation set
             self.model.eval()
@@ -130,10 +120,7 @@ class LongformerClassifier:
             
             # record epoch runtime 
             mid_curr = time.time()
-            print(
-                "Val loss:", round(val_loss/(len(val_loader)*val_loader.batch_size), 4), "\t",
-                "Val acc:", round(val_acc/(len(val_loader)*val_loader.batch_size), 4)
-            )
+            self._print_results("Val", val_loss, val_acc, val_loader)
             self._print_time("Runtime:", mid_prev, mid_curr)
             mid_prev = mid_curr
             print("--------------------")
@@ -167,10 +154,7 @@ class LongformerClassifier:
                 true_labels.extend(true)
                 pred_labels.extend(pred)
 
-        print(
-            "Test loss:", round(test_loss/(len(test_loader)*test_loader.batch_size), 4), "\t", 
-            "Test acc:", round(test_acc/(len(test_loader)*test_loader.batch_size), 4), 
-        )
+        self._print_results("Test", test_loss, test_acc, test_loader)
         
         return true_labels, pred_labels
 
@@ -180,53 +164,68 @@ class LongformerClassifier:
         print(tag, round((end-start)//3600), "hr", round(((end-start)%3600)//60), "min",  round((end-start)%60), "sec")     
 
 #-----------------------------------------------------------------
+
+    def _print_results(type, loss, acc, data_loader):
+        print(
+            type + " loss:", round(loss/(len(data_loader)*data_loader.batch_size), 4), "\t", 
+            type + " acc:", round(acc/(len(data_loader)*data_loader.batch_size), 4), 
+        )
+
+#-----------------------------------------------------------------
 #  End of Class LongformerClassifier
 #-----------------------------------------------------------------
 
 if __name__ == "__main__":
+
+    import pandas as pd
+    from config import *
+    from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+    from torch.utils.data import DataLoader
+
     parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--mode', help="train or test model", required=True)
     parser.add_argument('--checkpoint', help="specify checkpoint using", default="allenai/longformer-base-4096")
+    parser.add_argument('--save_name', help="name for saving models", required=True)
     args, unknown = parser.parse_known_args()
 
     # set parameters
+    N_LABELS = 19
+    MAX_LENGTH = 3072
+    LR = 2e-5              
     BATCH_SIZE = 2
+    MAX_EPOCH = 5
 
-    # import encodings (X)
-    train_encodings = load_pickle('work/train_encodings.pkl')
-    val_encodings = load_pickle('work/val_encodings.pkl')
-    test_encodings = load_pickle('work/test_encodings.pkl')
+    # define classifier
+    clf = LongformerClassifier(num_labels=N_LABELS, tokenizer='allenai/longformer-base-4096', model=args.checkpoint)
+    
+    # import datasets
+    train_set = pd.read_json(TRAIN_DIR)
+    val_set = pd.read_json(VAL_DIR)
+    test_set = pd.read_json(TEST_DIR)
 
-    # import labels (y)
-    train_labels = load_pickle('work/train_class.pkl')
-    val_labels = load_pickle('work/val_class.pkl')
-    test_labels = load_pickle('work/test_class.pkl')
+    # encode texts with tokenizer
+    print("Encoding training set ...")
+    train_encodings = clf.tokenizer(list(train_set.X), max_length=MAX_LENGTH, truncation=True, padding=True)
+    print("Encoding validation set ...")
+    val_encodings = clf.tokenizer(list(val_set.X), max_length=MAX_LENGTH, truncation=True, padding=True)
+    print("Encoding test set ...")
+    test_encodings = clf.tokenizer(list(test_set.X), max_length=MAX_LENGTH, truncation=True, padding=True)
 
     # create numerical index 
-    class2label = {cls:i for i, cls in enumerate(sorted(list(set(train_labels))))}
+    class2label = {cls:i for i, cls in enumerate(sorted(list(set(train_set.y_class))))}
     label2class = {v:k for k,v in class2label.items()}
 
     # build custom datasets
-    train_dataset = GutenbergDataset(train_encodings, [class2label[cls] for cls in train_labels])
-    val_dataset = GutenbergDataset(val_encodings, [class2label[cls] for cls in val_labels])
-    test_dataset = GutenbergDataset(test_encodings, [class2label[cls] for cls in test_labels])
+    train_dataset = GutenbergDataset(train_encodings, [class2label[cls] for cls in train_set.y_class])
+    val_dataset = GutenbergDataset(val_encodings, [class2label[cls] for cls in val_set.y_class])
+    test_dataset = GutenbergDataset(test_encodings, [class2label[cls] for cls in test_set.y_class])
 
     # build data loaders
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
-    # execute main
-    clf = LongformerClassifier(tokenizer='allenai/longformer-base-4096', model=args.checkpoint, num_labels=19)
-    if args.mode == "train":
-        print("========== Start Training ==========")
-        clf.train(train_loader, val_loader, save_model_name="longformer-class-2048", max_epoch=3)
-        print("====================================")
-    elif args.mode == "test":
-        print("========== Start Testing ==========")
-        true, pred = clf.predict(test_loader)
-        print("===================================")
-    else:
-        print('Error: Please input "train" or "test".')
-
-
+    # train model
+    print("========== Start Training ==========")
+    clf.train(train_loader, val_loader, save_name=args.save_name, learning_rate=LR, max_epoch=MAX_EPOCH)
+    print("========== Start Testing ===========")
+    _ , _ = clf.predict(test_loader)
