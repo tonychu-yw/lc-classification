@@ -1,2 +1,0 @@
-1. lr = 5e-5 -> 3 epochs -> freeze weights -> models/longformer-class-2048-1630847425
-2. lr = 5e-5 -> 3 epochs -> 
