@@ -280,7 +280,6 @@ def clean_metadata(metadata_dir, books_folder, output_dir):
 
 #-----------------------------------------------------------------
 
-# save pickle files
 def save_pickle(stuff, fileName):
     """
     Args:
@@ -295,7 +294,6 @@ def save_pickle(stuff, fileName):
 
 #-----------------------------------------------------------------
 
-# load pickle files
 def load_pickle(fileName):
     """
     Args:
