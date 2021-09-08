@@ -1,16 +1,9 @@
 import numpy as np
 import time
-import pickle
-
-import subprocess
-import sys
-
-def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-
-install('transformers')
+import_or_install('transformers')
 import torch
 from transformers import LongformerTokenizer, LongformerModel
+from config import *
 
 #-----------------------------------------------------------------
 #  Class Book2Vec
@@ -62,20 +55,29 @@ class Book2Vec:
         return doc_embeds
 
 #-----------------------------------------------------------------
-
-    @classmethod
-    def save_embeddings(cls, embeddings, filename):
-        with open(filename, 'wb') as handle:
-            pickle.dump(np.array(embeddings), handle)
-            
-#-----------------------------------------------------------------
-
-    @classmethod
-    def load_embeddings(cls, filename):
-        with open(filename, 'rb') as handle:
-            embeddings = pickle.load(handle)
-        return embeddings
-
-#-----------------------------------------------------------------
 #  End of Class Book2Vec
 #-----------------------------------------------------------------
+
+if __name__ == "main":
+
+    # import data
+    model = Book2Vec(tokenizer='allenai/longformer-base-4096', model='allenai/longformer-base-4096')
+    train_set = pd.read_json(TRAIN_DIR)
+    val_set = pd.read_json(VAL_DIR)
+    test_set = pd.read_json(TEST_DIR)
+
+    # get embeddings
+    train_embeddings = model.get_embeddings(train_set.X)
+    val_embeddings = model.get_embeddings(val_set.X)
+    test_embeddings = model.get_embeddings(test_set.X)
+
+    # output embeddings to dataframe
+    train_embeddings_df = pd.DataFrame({"id": train_set.id, "embeddings": train_embeddings})
+    val_embeddings_df = pd.DataFrame({"id": val_set.id, "embeddings": val_embeddings)})
+    test_embeddings_df = pd.DataFrame({"id": test_set.id, "embeddings": test_embeddings})
+
+    # save embeddings (dimension = 768)
+    train_embeddings_df.to_json('./work/longformer_train_embeddings.json')
+    val_embeddings_df.to_json('./work/longformer_val_embeddings.json')
+    test_embeddings_df.to_json('./work/longformer_test_embeddings.json')
+    print("Longformer embeddings saved to ./work" )
