@@ -6,6 +6,7 @@ import json
 import xml.etree.ElementTree as ET
 import numpy as np
 import pandas as pd
+import pickle
 
 #-----------------------------------------------------------------
 
@@ -276,5 +277,34 @@ def clean_metadata(metadata_dir, books_folder, output_dir):
 
     # save cleaned metadata
     df_final.to_json(output_dir)
+
+#-----------------------------------------------------------------
+
+# save pickle files
+def save_pickle(stuff, fileName):
+    """
+    Args:
+        stuff:          object to output
+        fileName:       file directory for output
+    Return:
+        None            (save output file directly)
+    """
+
+    with open(fileName, 'wb') as f:
+        pickle.dump(stuff, f, pickle.HIGHEST_PROTOCOL)
+
+#-----------------------------------------------------------------
+
+# load pickle files
+def load_pickle(fileName):
+    """
+    Args:
+        fileName:       file directory
+    Return:
+        file:           python object
+    """
+
+    with open(fileName, 'rb') as f:
+        return pickle.load(f)
 
 #-----------------------------------------------------------------

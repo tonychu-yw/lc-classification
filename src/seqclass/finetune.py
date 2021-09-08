@@ -14,18 +14,6 @@ import torch
 from sklearn.metrics import accuracy_score
 from transformers import LongformerTokenizerFast, LongformerForSequenceClassification, AdamW 
 
-# import pickle
-
-# save pickle files
-#def save_pickle(stuff, fileName):
-#    with open(fileName, 'wb') as f:
-#        pickle.dump(stuff, f, pickle.HIGHEST_PROTOCOL)
-
-# load pickle files
-#def load_pickle(fileName):
-#    with open(fileName, 'rb') as f:
-#        return pickle.load(f)
-
 #-----------------------------------------------------------------
 #  Class GutenbergDataset
 #-----------------------------------------------------------------
