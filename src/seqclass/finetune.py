@@ -192,10 +192,10 @@ if __name__ == "__main__":
     MAX_LENGTH = 3072
     LR = 2e-5              
     BATCH_SIZE = 2
-    MAX_EPOCH = 5
+    MAX_EPOCH = 3
 
     # define classifier
-    clf = LongformerClassifier(num_labels=N_LABELS, tokenizer='allenai/longformer-base-4096', model=args.checkpoint)
+    clf = LongformerClassifier(num_labels=N_LABELS, tokenizer='allenai/longformer-base-4096', model='models/'+args.checkpoint)
     
     # import datasets
     train_set = pd.read_json(TRAIN_DIR)

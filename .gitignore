@@ -4,13 +4,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# jupyter notebooks
+# jupyter notebooks checkpoints
 */.ipynb_checkpoints/*
 *.ipynb_checkpoints
 
 # data
 data/
-work/
 models/
 */.gsheet/*
 *.gsheet
