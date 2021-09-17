@@ -1,18 +1,27 @@
 import pandas as pd
+import pip
+
+# import packages if not exist
+def import_or_install(package):
+    try:
+        __import__(package)
+    except ImportError:
+        pip.main(['install', package])
+
 import_or_install('sentence_transformers')
 from sentence_transformers import SentenceTransformer
 from config import *
 
-if __name__ = "main":
+if __name__ == "__main__":
 
     model = SentenceTransformer('all-MiniLM-L6-v2')
     model.max_seq_length = 512
 
     # read text data
-    train_set = pd.read_json(TRAIN_DIR)
-    val_set = pd.read_json(VAL_DIR)
-    test_set = pd.read_json(TEST_DIR)
-
+    train_set = pd.read_json(TRAIN_DIR).reset_index(drop=True)
+    val_set = pd.read_json(VAL_DIR).reset_index(drop=True)
+    test_set = pd.read_json(TEST_DIR).reset_index(drop=True)
+    
     # encode text to embeddings
     train_embeddings = model.encode(train_set.X)
     val_embeddings = model.encode(val_set.X)

@@ -1,5 +1,15 @@
+import pandas as pd
 import numpy as np
+import pip
 import time
+
+# import packages if not exist
+def import_or_install(package):
+    try:
+        __import__(package)
+    except ImportError:
+        pip.main(['install', package])
+        
 import_or_install('transformers')
 import torch
 from transformers import LongformerTokenizer, LongformerModel
@@ -58,22 +68,23 @@ class Book2Vec:
 #  End of Class Book2Vec
 #-----------------------------------------------------------------
 
-if __name__ == "main":
+if __name__ == "__main__":
 
     # import data
     model = Book2Vec(tokenizer='allenai/longformer-base-4096', model='allenai/longformer-base-4096')
-    train_set = pd.read_json(TRAIN_DIR)
-    val_set = pd.read_json(VAL_DIR)
-    test_set = pd.read_json(TEST_DIR)
+    train_set = pd.read_json(TRAIN_DIR).reset_index(drop=True)
+    val_set = pd.read_json(VAL_DIR).reset_index(drop=True)
+    test_set = pd.read_json(TEST_DIR).reset_index(drop=True)
 
     # get embeddings
+    print("Encoding books ... ")
     train_embeddings = model.get_embeddings(train_set.X)
     val_embeddings = model.get_embeddings(val_set.X)
     test_embeddings = model.get_embeddings(test_set.X)
 
     # output embeddings to dataframe
     train_embeddings_df = pd.DataFrame({"id": train_set.id, "embeddings": train_embeddings})
-    val_embeddings_df = pd.DataFrame({"id": val_set.id, "embeddings": val_embeddings)})
+    val_embeddings_df = pd.DataFrame({"id": val_set.id, "embeddings": val_embeddings})
     test_embeddings_df = pd.DataFrame({"id": test_set.id, "embeddings": test_embeddings})
 
     # save embeddings (dimension = 768)
