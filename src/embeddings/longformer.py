@@ -86,9 +86,9 @@ if __name__ == "__main__":
     test_embeddings = model.get_embeddings(test_set.X)
 
     # output embeddings to dataframe
-    train_embeddings_df = pd.DataFrame({"id": train_set.id, "embeddings": train_embeddings})
-    val_embeddings_df = pd.DataFrame({"id": val_set.id, "embeddings": val_embeddings})
-    test_embeddings_df = pd.DataFrame({"id": test_set.id, "embeddings": test_embeddings})
+    train_embeddings_df = pd.DataFrame({"id": train_set.id, "embeddings": train_embeddings}).reset_index(drop=True)
+    val_embeddings_df = pd.DataFrame({"id": val_set.id, "embeddings": val_embeddings}).reset_index(drop=True)
+    test_embeddings_df = pd.DataFrame({"id": test_set.id, "embeddings": test_embeddings}).reset_index(drop=True)
 
     # save embeddings (dimension = 768)
     train_embeddings_df.to_json('./work/longformer_train_embeddings.json')
