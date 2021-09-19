@@ -13,7 +13,6 @@ def import_or_install(package):
 import_or_install('transformers')
 import torch
 from transformers import LongformerTokenizer, LongformerModel
-from config import *
 
 #-----------------------------------------------------------------
 #  Class Book2Vec
@@ -69,6 +68,10 @@ class Book2Vec:
 #-----------------------------------------------------------------
 
 if __name__ == "__main__":
+
+    import sys
+    sys.path.append('../src')
+    from src.config import *
 
     # import data
     model = Book2Vec(tokenizer='allenai/longformer-base-4096', model='allenai/longformer-base-4096')

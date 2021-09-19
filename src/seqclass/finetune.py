@@ -166,9 +166,11 @@ class LongformerClassifier:
 if __name__ == "__main__":
 
     import pandas as pd
-    from config import *
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     from torch.utils.data import DataLoader
+    import sys
+    sys.path.append('../src')
+    from src.config import *
 
     parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument('--checkpoint', help="specify checkpoint using", default="allenai/longformer-base-4096")
